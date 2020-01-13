@@ -35,7 +35,8 @@ export default class Player extends React.Component {
             const videoUrl = $video.src;
             const subtitleUrl = $track ? $track.src : '';
             if (props.videoUrl !== videoUrl) {
-                state.art.player.switchUrl(props.videoUrl);
+                const file = document.querySelector('.uploadVideo').files[0];
+                state.art.player.switchUrl(props.videoUrl, file ? file.name : '');
                 URL.revokeObjectURL(videoUrl);
             }
 
@@ -66,6 +67,9 @@ export default class Player extends React.Component {
                                 subtitle: {
                                     url: subtitleUrl,
                                 },
+                                moreVideoAttr: {
+                                    crossOrigin: 'anonymous',
+                                },
                             }}
                             getInstance={art => {
                                 (function loop() {
@@ -77,8 +81,10 @@ export default class Player extends React.Component {
                                     });
                                 })();
 
-                                art.once('video:canplay', () => {
-                                    art.player.seek = 1;
+                                art.on('ready', () => {
+                                    setTimeout(() => {
+                                        art.player.seek = 1;
+                                    }, 1000);
                                 });
 
                                 art.on('seek', () => {
